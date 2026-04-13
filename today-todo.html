@@ -154,9 +154,10 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
 .pin-btn:hover{color:var(--rose) !important;}
 .edit-btn:hover{color:var(--sage) !important;}
 
-.fab{position:fixed;bottom:36px;left:calc(60px + 380px);transform:translateX(-50%);background:var(--ink);color:var(--bg);border:none;border-radius:100px;padding:13px 28px;font-family:'Jost',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(26,22,16,0.18);z-index:50;transition:background .2s,transform .1s;}
+.fab{background:var(--ink);color:var(--bg);border:none;border-radius:100px;padding:13px 28px;font-family:'Jost',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(26,22,16,0.18);transition:background .2s,transform .1s;}
 .fab:hover{background:var(--ink2);}
-.fab:active{transform:translateX(-50%) scale(0.97);}
+.fab:active{transform:scale(0.97);}
+.fab:disabled{background:var(--border2);cursor:default;box-shadow:none;}
 
 .overlay{display:none;position:fixed;inset:0;background:rgba(26,22,16,0.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;align-items:flex-end;justify-content:center;}
 .overlay.open{display:flex;}
@@ -214,10 +215,56 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
 @keyframes tOut{to{opacity:0;transform:translateY(8px);}}
 .toast-undo{background:none;border:none;color:var(--sage);font-family:'Jost',sans-serif;font-size:12px;cursor:pointer;padding:0;font-weight:500;}
 
+/* Scaled completion rewards */
+@keyframes rowGlow{0%{background:transparent;}20%{background:rgba(184,146,74,0.13);}80%{background:rgba(184,146,74,0.1);}100%{background:transparent;}}
+.row-glow-amber{animation:rowGlow 1.5s ease forwards;}
+@keyframes ringSpinAnim{from{transform:rotate(-90deg);}to{transform:rotate(270deg);}}
+.ring-spin .rf{animation:ringSpinAnim .85s cubic-bezier(.4,0,.2,1) forwards;}
+.fc-big-msg{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;font-style:italic;color:var(--ink);text-align:center;padding:10px 0;opacity:0;transition:opacity .35s;display:none;}
+.fc-big-msg.vis{opacity:1;display:block;}
+.fc-sage-flash{background:rgba(107,143,110,0.22)!important;border-left-color:var(--sage)!important;transition:background .5s,border-left-color .5s;}
+
+/* Plan my day */
+#fab-container{position:fixed;bottom:36px;left:calc(60px + 380px);transform:translateX(-50%);display:flex;align-items:center;gap:10px;z-index:50;}
+.plan-fab{background:var(--bg);color:var(--ink);border:1px solid var(--border2);border-radius:100px;padding:12px 16px;font-family:'Jost',sans-serif;font-size:17px;cursor:pointer;box-shadow:0 4px 24px rgba(26,22,16,0.12);transition:background .2s,border-color .2s;line-height:1;}
+.plan-fab:hover{background:var(--surface);}
+.plan-fab.active{background:var(--sage);border-color:var(--sage);color:white;}
+.plan-sel{width:18px;height:18px;border:1.5px solid var(--border2);border-radius:50%;flex-shrink:0;margin-top:1px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .15s;}
+.plan-mode .plan-sel{display:flex;}
+.plan-sel.selected{background:var(--sage);border-color:var(--sage);}
+.plan-sel.selected::after{content:'';display:block;width:5px;height:3px;border-left:1.5px solid white;border-bottom:1.5px solid white;transform:rotate(-45deg) translateY(-1px);}
+.plan-mode .cb{display:none;}
+
+/* Day filter */
+.h-date-wrap{display:flex;align-items:center;gap:7px;}
+.h-date{display:inline;cursor:default;}
+.h-date.filterable{cursor:pointer;}
+.h-date.filterable:hover{text-decoration:underline;text-underline-offset:3px;}
+.day-filter-dot{width:5px;height:5px;border-radius:50%;background:var(--sage);display:none;flex-shrink:0;}
+.day-filter-dot.vis{display:block;}
+.week-tog{background:none;border:none;cursor:pointer;font-size:14px;color:var(--ink3);padding:0;line-height:1;transition:color .2s;font-family:'Jost',sans-serif;}
+.week-tog:hover{color:var(--ink);}
+
+/* Weekly view overlay */
+.week-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,22,16,0.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding-top:60px;}
+.week-overlay.open{display:flex;}
+.week-box{background:var(--bg);border-radius:16px;padding:28px 28px 32px;width:100%;max-width:480px;max-height:78vh;overflow-y:auto;animation:sup .26s cubic-bezier(.34,1.2,.64,1);}
+.week-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;font-style:italic;color:var(--ink);margin-bottom:20px;}
+.week-day-lbl{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin:16px 0 6px;font-weight:400;}
+.week-day-lbl:first-child{margin-top:0;}
+.week-task{font-size:14px;font-weight:300;color:var(--ink);padding:5px 0;border-bottom:1px solid var(--border);}
+.week-task.wt-done{opacity:0.4;text-decoration:line-through;}
+
+/* Day picker in modal */
+.day-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;}
+.day-chip{padding:6px 10px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);background:none;border:1px solid var(--border);border-radius:100px;cursor:pointer;transition:all .15s;font-weight:400;}
+.day-chip:hover{border-color:var(--border2);color:var(--ink2);}
+.day-chip.sel-day{background:var(--surface);border-color:var(--sage);color:var(--sage);}
+.t-day-tag{font-size:10px;color:var(--ink3);font-weight:300;background:var(--surface);border-radius:100px;padding:2px 7px;opacity:0.75;}
+
 @media(max-width:900px){
   .wrap{padding:36px 24px 160px 28px;}
-  .fab{left:50%;transform:translateX(-50%);}
-  .fab:active{transform:translateX(-50%) scale(0.97);}
+  #fab-container{left:50%;}
   .m-row{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:600px){
@@ -249,7 +296,11 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
   <div class="wrap">
     <div class="hdr">
       <div>
-        <div class="h-date" id="hdate"></div>
+        <div class="h-date-wrap">
+          <div class="h-date filterable" id="hdate" onclick="toggleDayFilter()" title="filter by today"></div>
+          <div class="day-filter-dot" id="dfdot"></div>
+          <button class="week-tog" onclick="toggleWeekView()" title="weekly view">≡</button>
+        </div>
         <div class="h-title">do <em>it</em> today.</div>
       </div>
       <div class="hdr-r">
@@ -290,6 +341,7 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
       <div class="fc-name" id="fcname"></div>
       <div class="fc-meta" id="fcmeta"></div>
       <div class="fc-alldone" id="fcalldone">all done for now ✦</div>
+      <div class="fc-big-msg" id="fcbigmsg"></div>
       <button class="fc-done-btn" id="fcbtn" onclick="fcDone()">mark done</button>
     </div>
 
@@ -327,9 +379,13 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
     </div>
   </div>
 
-  <button class="fab" onclick="openModal()">
-    <span style="font-size:16px;font-weight:300;line-height:1;margin-top:-1px">+</span> add task
-  </button>
+  <div id="fab-container">
+    <button class="plan-fab" id="planfab" onclick="togglePlanMode()" title="plan my day">◫</button>
+    <button class="fab" id="mainfab" onclick="fabClick()">
+      <span style="font-size:16px;font-weight:300;line-height:1;margin-top:-1px" id="fabplus">+</span>
+      <span id="fabtxt">add task</span>
+    </button>
+  </div>
 </div>
 
 <div class="overlay" id="ov" onclick="ocl(event)">
@@ -361,6 +417,16 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
         </div>
       </div>
     </div>
+    <label class="m-lbl">day</label>
+    <div class="day-chips" id="sday">
+      <button class="day-chip" data-v="monday" onclick="setDay('monday')">M</button>
+      <button class="day-chip" data-v="tuesday" onclick="setDay('tuesday')">T</button>
+      <button class="day-chip" data-v="wednesday" onclick="setDay('wednesday')">W</button>
+      <button class="day-chip" data-v="thursday" onclick="setDay('thursday')">Th</button>
+      <button class="day-chip" data-v="friday" onclick="setDay('friday')">F</button>
+      <button class="day-chip" data-v="saturday" onclick="setDay('saturday')">Sa</button>
+      <button class="day-chip" data-v="sunday" onclick="setDay('sunday')">Su</button>
+    </div>
     <label class="m-lbl">due date</label>
     <input class="m-in" type="date" id="td"/>
     <label class="m-lbl">notes</label>
@@ -382,6 +448,13 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
   </div>
 </div>
 
+<div class="week-overlay" id="weekov" onclick="weekOvClick(event)">
+  <div class="week-box">
+    <div class="week-title">this week</div>
+    <div id="weekcontent"></div>
+  </div>
+</div>
+
 <div class="note-overlay" id="nov">
   <div class="note-box">
     <label class="note-lbl">how did it go? (optional)</label>
@@ -394,8 +467,9 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
 </div>
 
 <script>
-let user=null,mp='high',mu='high',mt=null,mr='none',editingId=null,focusMode=false;
+let user=null,mp='high',mu='high',mt=null,mr='none',md=null,editingId=null,focusMode=false;
 let pendingNoteId=null,toastTmr=null,fcTaskId=null,allDoneTmr=null,noteTmr=null,showRep=false;
+let planMode=false,planSelected=new Set(),dayFilterActive=false,weekViewOpen=false;
 
 const gu=()=>JSON.parse(localStorage.getItem('td_u')||'{}');
 const ga=()=>JSON.parse(localStorage.getItem('td_t')||'{}');
@@ -443,6 +517,7 @@ function showApp(){
   document.getElementById('hdate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   focusMode=gp('focus')||false;
   updateFocusTog();
+  checkPlanDate();
   checkCarryover();
   checkSomeday();
   render();
@@ -475,9 +550,17 @@ function sortTasks(arr){
 }
 
 function render(){
-  const tasks=gt();
+  let tasks=gt();
+  // Day filter
+  if(dayFilterActive){
+    const DAYS=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    const tod=DAYS[new Date().getDay()];
+    tasks=tasks.filter(t=>t.dayAssigned===tod);
+  }
   const B={1:[],2:[],3:[],4:[]};
   tasks.forEach(t=>B[quad(t.priority,t.urgency)].push(t));
+  // Plan mode body class
+  document.getElementById('nv').classList.toggle('plan-mode',planMode);
   const today=new Date();today.setHours(0,0,0,0);
   const hasDone=tasks.some(t=>t.done);
   const cb=document.getElementById('clearbtn');
@@ -486,7 +569,9 @@ function render(){
 
   // Focus card
   const doSorted=sortTasks(B[1]);
-  const undone=doSorted.filter(t=>!t.done);
+  const undone=planMode&&planSelected.size>0
+    ? doSorted.filter(t=>!t.done&&planSelected.has(t.id))
+    : doSorted.filter(t=>!t.done);
   const fc=document.getElementById('fc');
   if(!tasks.length){
     fc.classList.remove('vis');
@@ -547,7 +632,9 @@ function render(){
       const badge=t.unclassified
         ?`<span class="t-badge b-unc" onclick="openEdit('${t.id}')">unclassified ✎</span>`
         :`<span class="t-badge ${qBadge(qn)}">${qLabel(qn)}</span>`;
+      const isSel=planSelected.has(t.id);
       return`<div class="titem${t.done?' done':''}" id="ti-${t.id}">
+        <div class="plan-sel${isSel?' selected':''}" onclick="togglePlanSel('${t.id}')"></div>
         <div class="cb${t.done?' on':''}" onclick="toggle('${t.id}')"></div>
         <div class="t-body">
           <div class="t-name" ondblclick="inlineEdit('${t.id}',this)">${esc(t.name)}</div>
@@ -555,6 +642,7 @@ function render(){
             ${due?`<span class="t-due${late?' late':''}">${late?'overdue · ':''}${due}</span>`:''}
             ${badge}
             ${t.time?`<span class="t-time-tag">${timeLbl(t.time)}</span>`:''}
+            ${t.dayAssigned?`<span class="t-day-tag">${{monday:'M',tuesday:'T',wednesday:'W',thursday:'Th',friday:'F',saturday:'Sa',sunday:'Su'}[t.dayAssigned]||t.dayAssigned}</span>`:''}
             ${t.recurring&&t.recurring!=='none'?`<span class="t-recur">↻ ${t.recurring}</span>`:''}
             ${t.note?`<span class="t-note-p">${esc(t.note)}</span>`:''}
           </div>
@@ -578,12 +666,48 @@ function render(){
   document.getElementById('rtotal').textContent=(gp('cumul')||0)+' done total';
 }
 
+const BIG_MSGS=['that was a big one.','well done.','that took something.','one less heavy thing.'];
+function scaledReward(task){
+  const mins=task.time||0;
+  if(mins>=180){
+    // 3h: sage flash + big message on focus card
+    const fc=document.getElementById('fc');
+    fc.classList.add('fc-sage-flash');
+    const msg=document.getElementById('fcbigmsg');
+    msg.textContent=BIG_MSGS[Math.floor(Math.random()*BIG_MSGS.length)];
+    msg.classList.add('vis');
+    setTimeout(()=>{
+      msg.classList.remove('vis');
+      setTimeout(()=>{fc.classList.remove('fc-sage-flash');msg.style.display='none';setTimeout(()=>{msg.style.display='';},50);},400);
+    },3000);
+  }else if(mins>=60){
+    // 1h: focus card sage flash + ring spin (100ms after render)
+    const fc=document.getElementById('fc');
+    fc.classList.add('fc-sage-flash');
+    setTimeout(()=>{
+      const rw=document.querySelector('.ring-w');
+      rw.classList.add('ring-spin');
+      setTimeout(()=>rw.classList.remove('ring-spin'),900);
+      setTimeout(()=>fc.classList.remove('fc-sage-flash'),1200);
+    },100);
+  }else if(mins>=30){
+    // 30m: amber row glow
+    setTimeout(()=>{
+      const el=document.getElementById('ti-'+task.id);
+      if(el){el.classList.add('row-glow-amber');setTimeout(()=>el.classList.remove('row-glow-amber'),1600);}
+    },80);
+  }
+  // 15m or no estimate: existing subtle fade (no action needed)
+}
+
 function toggle(id){
   const tasks=gt();const t=tasks.find(x=>x.id===id);if(!t)return;
   if(!t.done){
+    const taskSnap={...t};
     t.done=true;st(tasks);
     sp('cumul',(gp('cumul')||0)+1);
     render();
+    scaledReward(taskSnap);
     if(t.recurring&&t.recurring!=='none'){
       setTimeout(()=>{
         const ts=gt();const rt=ts.find(x=>x.id===id);if(!rt)return;
@@ -687,6 +811,10 @@ function updateHint(){
   const el=document.getElementById('hint');el.textContent=txt;el.className='hint '+cls;
 }
 
+function setDay(v){
+  md=(md===v)?null:v;
+  document.querySelectorAll('#sday .day-chip').forEach(b=>{b.classList.toggle('sel-day',b.dataset.v===md);});
+}
 function openModal(prefill){
   editingId=null;
   document.getElementById('mtitle').textContent='new task';
@@ -694,8 +822,9 @@ function openModal(prefill){
   document.getElementById('tn').value=prefill||'';
   ['td','tno'].forEach(id=>document.getElementById(id).value='');
   showRep=false;document.getElementById('repsec').classList.remove('vis');document.getElementById('repar').textContent='▸';
-  setSeg('p','high');setSeg('u','high');mt=null;mr='none';
+  setSeg('p','high');setSeg('u','high');mt=null;mr='none';md=null;
   document.querySelectorAll('#st .seg,#sr .seg').forEach(b=>b.className='seg');
+  document.querySelectorAll('#sday .day-chip').forEach(b=>b.className='day-chip');
   document.getElementById('ov').classList.add('open');
   setTimeout(()=>document.getElementById('tn').focus(),50);
   updateHint();
@@ -711,6 +840,8 @@ function openEdit(id){
   setSeg('p',t.priority||'high');setSeg('u',t.urgency||'high');
   mt=t.time||null;
   document.querySelectorAll('#st .seg').forEach(b=>{b.className='seg';if(mt&&parseInt(b.dataset.v)===mt)b.classList.add('sel-time');});
+  md=t.dayAssigned||null;
+  document.querySelectorAll('#sday .day-chip').forEach(b=>{b.classList.toggle('sel-day',b.dataset.v===md);});
   mr=t.recurring||'none';
   document.querySelectorAll('#sr .seg').forEach(b=>{b.className='seg';if(b.dataset.v===mr)b.classList.add('sel-'+mr);});
   document.getElementById('ov').classList.add('open');
@@ -726,9 +857,9 @@ function saveTask(){
   const tasks=gt();
   if(editingId){
     const t=tasks.find(x=>x.id===editingId);
-    if(t){t.name=name;t.priority=mp;t.urgency=mu;t.time=mt;t.due=document.getElementById('td').value;t.notes=document.getElementById('tno').value.trim();t.recurring=mr;t.unclassified=false;}
+    if(t){t.name=name;t.priority=mp;t.urgency=mu;t.time=mt;t.due=document.getElementById('td').value;t.notes=document.getElementById('tno').value.trim();t.recurring=mr;t.dayAssigned=md||null;t.unclassified=false;}
   }else{
-    tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),name,priority:mp,urgency:mu,time:mt,due:document.getElementById('td').value,notes:document.getElementById('tno').value.trim(),recurring:mr,done:false,unclassified:false});
+    tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),name,priority:mp,urgency:mu,time:mt,due:document.getElementById('td').value,notes:document.getElementById('tno').value.trim(),recurring:mr,dayAssigned:md||null,done:false,unclassified:false});
   }
   st(tasks);closeModal();render();
 }
@@ -764,7 +895,11 @@ function checkSomeday(){
 }
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();skipNote();}
+  if(e.key==='Escape'){
+    closeModal();skipNote();
+    if(weekViewOpen)toggleWeekView();
+    if(planMode)togglePlanMode();
+  }
   const ovOpen=document.getElementById('ov').classList.contains('open');
   const novOpen=document.getElementById('nov').classList.contains('open');
   const authVis=document.getElementById('auth').style.display!=='none';
@@ -772,6 +907,102 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&novOpen)saveNote();
   if(e.key==='Enter'&&authVis&&!ovOpen)doAuth();
 });
+
+// Plan my day
+function checkPlanDate(){
+  const stored=localStorage.getItem('plan_date_'+user);
+  if(!stored)return;
+  const today=new Date().toISOString().split('T')[0];
+  if(stored<today){
+    localStorage.removeItem('plan_'+stored+'_'+user);
+    localStorage.removeItem('plan_date_'+user);
+    planSelected=new Set();
+  }else{
+    try{const ids=JSON.parse(localStorage.getItem('plan_'+stored+'_'+user)||'[]');planSelected=new Set(ids);}catch(e){planSelected=new Set();}
+  }
+}
+function togglePlanMode(){
+  if(planMode){
+    // exit without committing
+    planMode=false;
+    document.getElementById('planfab').classList.remove('active');
+    document.getElementById('fabplus').style.display='';
+    document.getElementById('fabtxt').textContent='add task';
+    document.getElementById('mainfab').disabled=false;
+    render();
+  }else{
+    planMode=true;
+    document.getElementById('planfab').classList.add('active');
+    updatePlanFab();
+    render();
+  }
+}
+function togglePlanSel(id){
+  if(!planMode)return;
+  if(planSelected.has(id))planSelected.delete(id);else planSelected.add(id);
+  updatePlanFab();
+  // re-render just the circles without full render (re-render is fine here)
+  render();
+}
+function updatePlanFab(){
+  const n=planSelected.size;
+  document.getElementById('fabplus').style.display='none';
+  document.getElementById('fabtxt').textContent=n>0?`let's go — ${n} task${n>1?'s':''}`:`let's go — 0 tasks`;
+  document.getElementById('mainfab').disabled=(n===0);
+}
+function fabClick(){
+  if(planMode){commitPlan();}else{openModal();}
+}
+function commitPlan(){
+  const today=new Date().toISOString().split('T')[0];
+  localStorage.setItem('plan_date_'+user,today);
+  localStorage.setItem('plan_'+today+'_'+user,JSON.stringify([...planSelected]));
+  planMode=false;
+  document.getElementById('planfab').classList.remove('active');
+  document.getElementById('fabplus').style.display='';
+  document.getElementById('fabtxt').textContent='add task';
+  document.getElementById('mainfab').disabled=false;
+  render();
+}
+
+// Day filter
+function toggleDayFilter(){
+  dayFilterActive=!dayFilterActive;
+  document.getElementById('dfdot').classList.toggle('vis',dayFilterActive);
+  render();
+}
+
+// Weekly view
+function toggleWeekView(){
+  weekViewOpen=!weekViewOpen;
+  const ov=document.getElementById('weekov');
+  if(weekViewOpen){buildWeekView();ov.classList.add('open');}
+  else{ov.classList.remove('open');}
+}
+function weekOvClick(e){if(e.target===document.getElementById('weekov'))toggleWeekView();}
+function buildWeekView(){
+  const ORDER=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  const tasks=gt();
+  const byDay={};
+  ORDER.forEach(d=>byDay[d]=[]);
+  const unscheduled=[];
+  tasks.forEach(t=>{
+    if(t.dayAssigned&&byDay[t.dayAssigned])byDay[t.dayAssigned].push(t);
+    else if(!t.dayAssigned)unscheduled.push(t);
+  });
+  let html='';
+  ORDER.forEach(d=>{
+    if(!byDay[d].length)return;
+    html+=`<div class="week-day-lbl">${d}</div>`;
+    byDay[d].forEach(t=>{html+=`<div class="week-task${t.done?' wt-done':''}">${esc(t.name)}</div>`;});
+  });
+  if(unscheduled.length){
+    html+=`<div class="week-day-lbl">unscheduled</div>`;
+    unscheduled.forEach(t=>{html+=`<div class="week-task${t.done?' wt-done':''}">${esc(t.name)}</div>`;});
+  }
+  if(!html)html='<div style="font-size:13px;color:var(--ink3);font-weight:300;padding:8px 0">no tasks assigned to days yet.</div>';
+  document.getElementById('weekcontent').innerHTML=html;
+}
 
 // INIT
 const cu=localStorage.getItem('td_cu');
