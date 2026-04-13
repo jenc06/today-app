@@ -121,7 +121,7 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
 .q-time{font-size:10px;color:var(--ink3);font-weight:300;opacity:0.7;margin-left:4px;}
 
 .tlist{display:flex;flex-direction:column;}
-.titem{display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-bottom:1px solid var(--border);transition:opacity .3s,transform .3s;}
+.titem{display:flex;align-items:flex-start;gap:13px;padding:14px 0;border-bottom:1px solid var(--border);transition:opacity .3s,transform .3s;}
 .titem:first-child{border-top:1px solid var(--border);}
 .titem.done{opacity:0.3;}
 .titem.done .t-name{text-decoration:line-through;text-decoration-color:var(--ink3);}
@@ -215,6 +215,10 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
 @keyframes tOut{to{opacity:0;transform:translateY(8px);}}
 .toast-undo{background:none;border:none;color:var(--sage);font-family:'Jost',sans-serif;font-size:12px;cursor:pointer;padding:0;font-weight:500;}
 
+/* Ring pulse at 100% */
+@keyframes ringPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.ring-pulse{animation:ringPulse .5s ease;}
+
 /* Scaled completion rewards */
 @keyframes rowGlow{0%{background:transparent;}20%{background:rgba(184,146,74,0.13);}80%{background:rgba(184,146,74,0.1);}100%{background:transparent;}}
 .row-glow-amber{animation:rowGlow 1.5s ease forwards;}
@@ -257,7 +261,7 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
 
 /* Day picker in modal */
 .day-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;}
-.day-chip{padding:6px 10px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);background:none;border:1px solid var(--border);border-radius:100px;cursor:pointer;transition:all .15s;font-weight:400;}
+.day-chip{padding:6px 10px;min-width:34px;text-align:center;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);background:none;border:1px solid var(--border);border-radius:100px;cursor:pointer;transition:all .15s;font-weight:400;}
 .day-chip:hover{border-color:var(--border2);color:var(--ink2);}
 .day-chip.sel-day{background:var(--surface);border-color:var(--sage);color:var(--sage);}
 .t-day-tag{font-size:10px;color:var(--ink3);font-weight:300;background:var(--surface);border-radius:100px;padding:2px 7px;opacity:0.75;}
@@ -333,7 +337,7 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
     </div>
 
     <div class="quick-add-wrap">
-      <input class="quick-add" id="qadd" type="text" placeholder="quickly add a task — press enter"/>
+      <input class="quick-add" id="qadd" type="text" placeholder="add a task..."/>
     </div>
 
     <div class="focus-card" id="fc">
@@ -356,8 +360,8 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
     <div class="nv" id="nv">
       <div id="estat" style="display:none">
         <div class="empty-state">
-          <div class="empty-msg">your list is clear.</div>
-          <div class="empty-sub">add something to begin</div>
+          <div class="empty-msg" id="emsg">your list is clear.</div>
+          <div class="empty-sub" id="esub">add something to begin</div>
         </div>
       </div>
       <div class="qsec" id="s1">
@@ -469,7 +473,7 @@ body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--ink);}
 <script>
 let user=null,mp='high',mu='high',mt=null,mr='none',md=null,editingId=null,focusMode=false;
 let pendingNoteId=null,toastTmr=null,fcTaskId=null,allDoneTmr=null,noteTmr=null,showRep=false;
-let planMode=false,planSelected=new Set(),dayFilterActive=false,weekViewOpen=false;
+let planMode=false,planSelected=new Set(),dayFilterActive=false,weekViewOpen=false,lastPct=0;
 
 const gu=()=>JSON.parse(localStorage.getItem('td_u')||'{}');
 const ga=()=>JSON.parse(localStorage.getItem('td_t')||'{}');
@@ -584,7 +588,10 @@ function render(){
     document.getElementById('fcdot').classList.add('done');
     document.getElementById('fceye').textContent='all clear';
     fcTaskId=null;
-    if(!allDoneTmr)allDoneTmr=setTimeout(()=>{fc.classList.remove('vis','all-done');allDoneTmr=null;},3000);
+    if(!allDoneTmr)allDoneTmr=setTimeout(()=>{
+      fc.style.opacity='0';fc.style.transition='opacity .35s ease';
+      setTimeout(()=>{fc.classList.remove('vis','all-done');fc.style.opacity='';fc.style.transition='';allDoneTmr=null;},360);
+    },3000);
   }else if(undone.length){
     if(allDoneTmr){clearTimeout(allDoneTmr);allDoneTmr=null;}
     fc.classList.add('vis');fc.classList.remove('all-done');
@@ -606,16 +613,21 @@ function render(){
     document.getElementById('fmv').classList.add('vis');
     document.getElementById('nv').classList.add('hidden');
     const colors=['','rose','amber','sage','ink3'];
-    document.getElementById('fmc').innerHTML=[1,2,3,4].map(q=>{
+    const fmcHtml=[1,2,3,4].map(q=>{
       const n=B[q].filter(t=>!t.done).length;if(!n)return'';
       return`<div class="fm-item"><div class="fm-dot" style="background:var(--${colors[q]})"></div><span class="fm-lbl">${n} ${qLabel(q)}</span></div>`;
     }).join('');
+    document.getElementById('fmc').innerHTML=fmcHtml||'<span style="font-family:\'Cormorant Garamond\',serif;font-size:20px;font-weight:300;font-style:italic;color:var(--sage)">all clear ✦</span>';
   }else{
     document.getElementById('fmv').classList.remove('vis');
     document.getElementById('nv').classList.remove('hidden');
   }
 
-  document.getElementById('estat').style.display=tasks.length===0?'block':'none';
+  if(tasks.length===0){
+    document.getElementById('estat').style.display='block';
+    document.getElementById('emsg').textContent=dayFilterActive?'no tasks for today.':'your list is clear.';
+    document.getElementById('esub').textContent=dayFilterActive?'tasks assigned to other days are hidden':'add something to begin';
+  }else{document.getElementById('estat').style.display='none';}
 
   [1,2,3,4].forEach(q=>{
     const sec=document.getElementById('s'+q);
@@ -648,9 +660,9 @@ function render(){
           </div>
         </div>
         <div class="t-acts">
-          ${q===1?`<button class="act-btn pin-btn${t.pinned?' pinned':''}" onclick="pinTask('${t.id}')">◉</button>`:''}
-          <button class="act-btn edit-btn" onclick="openEdit('${t.id}')">✎</button>
-          <button class="act-btn" onclick="delTask('${t.id}')">×</button>
+          ${q===1?`<button class="act-btn pin-btn${t.pinned?' pinned':''}" onclick="pinTask('${t.id}')" title="pin to top">◉</button>`:''}
+          <button class="act-btn edit-btn" onclick="openEdit('${t.id}')" title="edit">✎</button>
+          <button class="act-btn" onclick="delTask('${t.id}')" title="delete">×</button>
         </div>
       </div>`;
     }).join('');
@@ -662,8 +674,14 @@ function render(){
   document.getElementById('ring').style.strokeDashoffset=circ-circ*pct/100;
   document.getElementById('rpct').textContent=pct+'%';
   document.getElementById('pbar').style.width=pct+'%';
-  document.getElementById('ptxt').textContent=done+' / '+total;
+  document.getElementById('ptxt').textContent=(pct===100&&total>0)?'all done ✦':done+' / '+total;
   document.getElementById('rtotal').textContent=(gp('cumul')||0)+' done total';
+  if(pct===100&&total>0&&lastPct!==100){
+    const rw=document.querySelector('.ring-w');
+    rw.classList.add('ring-pulse');
+    setTimeout(()=>rw.classList.remove('ring-pulse'),600);
+  }
+  lastPct=pct;
 }
 
 const BIG_MSGS=['that was a big one.','well done.','that took something.','one less heavy thing.'];
@@ -710,14 +728,14 @@ function toggle(id){
     scaledReward(taskSnap);
     if(t.recurring&&t.recurring!=='none'){
       setTimeout(()=>{
-        const ts=gt();const rt=ts.find(x=>x.id===id);if(!rt)return;
-        rt.done=false;
+        const ts=gt();const rt=ts.find(x=>x.id===id);if(!rt||!rt.done)return;
         const base=rt.due?new Date(rt.due+'T00:00:00'):new Date();
         const now=new Date();now.setHours(0,0,0,0);
         if(base<now)base.setTime(now.getTime());
         if(rt.recurring==='daily')base.setDate(base.getDate()+1);
         else base.setDate(base.getDate()+7);
         rt.due=base.toISOString().split('T')[0];
+        rt.done=false;
         st(ts);render();
       },1600);
     }
@@ -836,7 +854,7 @@ function openEdit(id){
   document.getElementById('msav').textContent='save';
   document.getElementById('tn').value=t.name;
   document.getElementById('td').value=t.due||'';
-  document.getElementById('tno').value=t.notes||'';
+  document.getElementById('tno').value=t.note||'';
   setSeg('p',t.priority||'high');setSeg('u',t.urgency||'high');
   mt=t.time||null;
   document.querySelectorAll('#st .seg').forEach(b=>{b.className='seg';if(mt&&parseInt(b.dataset.v)===mt)b.classList.add('sel-time');});
@@ -844,6 +862,9 @@ function openEdit(id){
   document.querySelectorAll('#sday .day-chip').forEach(b=>{b.classList.toggle('sel-day',b.dataset.v===md);});
   mr=t.recurring||'none';
   document.querySelectorAll('#sr .seg').forEach(b=>{b.className='seg';if(b.dataset.v===mr)b.classList.add('sel-'+mr);});
+  showRep=mr!=='none';
+  document.getElementById('repsec').classList.toggle('vis',showRep);
+  document.getElementById('repar').textContent=showRep?'▾':'▸';
   document.getElementById('ov').classList.add('open');
   setTimeout(()=>document.getElementById('tn').focus(),50);
   updateHint();
@@ -857,9 +878,9 @@ function saveTask(){
   const tasks=gt();
   if(editingId){
     const t=tasks.find(x=>x.id===editingId);
-    if(t){t.name=name;t.priority=mp;t.urgency=mu;t.time=mt;t.due=document.getElementById('td').value;t.notes=document.getElementById('tno').value.trim();t.recurring=mr;t.dayAssigned=md||null;t.unclassified=false;}
+    if(t){t.name=name;t.priority=mp;t.urgency=mu;t.time=mt;t.due=document.getElementById('td').value;t.note=document.getElementById('tno').value.trim();t.recurring=mr;t.dayAssigned=md||null;t.unclassified=false;}
   }else{
-    tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),name,priority:mp,urgency:mu,time:mt,due:document.getElementById('td').value,notes:document.getElementById('tno').value.trim(),recurring:mr,dayAssigned:md||null,done:false,unclassified:false});
+    tasks.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),name,priority:mp,urgency:mu,time:mt,due:document.getElementById('td').value,note:document.getElementById('tno').value.trim(),recurring:mr,dayAssigned:md||null,done:false,unclassified:false});
   }
   st(tasks);closeModal();render();
 }
