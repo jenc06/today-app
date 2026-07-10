@@ -1,7 +1,7 @@
 # Today App                                                                 
                                                                              
-  A portmanteau of "To-do" and "Today".
-  A quiet, focused todo app for getting through the day.         
+  >A portmanteau of "To-do" and "Today".
+  >A quiet, focused todo app for getting through the day.         
    
   ## Features                                                                   
   
