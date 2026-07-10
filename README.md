@@ -1,5 +1,6 @@
 # Today App                                                                 
                                                                              
+  A portmanteau of "To-do" and "Today".
   A quiet, focused todo app for getting through the day.         
    
   ## Features                                                                   
@@ -17,15 +18,15 @@
 
   ## Install
 
-  \```bash
+  ```bash
   npm install
-  \```
+  ```
 
   ## Run
 
-  \```bash
+  ```bash
   npm start
-  \```
+  ```
 
   ## Stack
 
