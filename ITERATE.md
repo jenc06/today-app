@@ -122,3 +122,14 @@ Short summary (5-8 lines) covering:
 - Plan my day mode: enter at start of day, select multiple tasks to commit to, hit "let's go",
   selected tasks get a subtle visual indicator across all quadrants, focus card only cycles
   through selected tasks.
+
+## aesthetic constraints (non-negotiable — apply to every iteration)
+- This app must stay minimal. If something feels like a dashboard, cut it.
+- Every element must earn its place. If it doesn't help Jennifer add, check off, or find a task faster — remove it.
+- The emotional goal is calm, not feature-rich. Opening the app should feel like opening a clean notebook, not a productivity system.
+- Cormorant Garamond serif only for the title and modal title. Jost for everything else.
+- Cream background #F0EBE1. Warm/cool color system: rose+amber = action, sage+ink3 = lower priority.
+- No gradients, no shadows except the FAB, no decorative elements.
+- Whitespace is a feature. Resist the urge to fill it.
+- If the debate produces more than 5 meaningful changes, cut the weakest ones. Fewer better changes beat many mediocre ones.
+- After implementing, ask: does this still feel like a calm notebook? If not, pull back.
