@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
 app.setPath('userData', path.join(app.getPath('home'), '.today-app-data'));
@@ -18,6 +18,12 @@ function createWindow() {
   win.loadFile('today-todo.html');
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(()=>{
+  createWindow();
+  Menu.setApplicationMenu(Menu.buildFromTemplate([
+    {role:'appMenu'},
+    {role:'viewMenu'}
+  ]));
+});
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
